@@ -174,7 +174,9 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", showToday)
+	http.HandleFunc("/misc", showMisc)
+
 	fmt.Println("Server listening on port 8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -182,7 +184,7 @@ func main() {
 	}
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func showToday(w http.ResponseWriter, r *http.Request) {
 	var idx int
 	var resp string
 
@@ -226,6 +228,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	default:
 		resp = ""
 	}
+
+	fmt.Fprintf(w, "%s", preHTML+resp+postHTML)
+}
+
+func showMisc(w http.ResponseWriter, r *http.Request) {
+	idx := rand.IntN(len(none))
+	resp := none[idx]
 
 	fmt.Fprintf(w, "%s", preHTML+resp+postHTML)
 }
