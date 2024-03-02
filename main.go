@@ -1,3 +1,7 @@
+// Dites
+// Starts a web server that returns catalan dites
+// Marc Riart Solans, 202402
+
 package main
 
 import (
@@ -183,6 +187,7 @@ func main() {
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/today", handlerToday)
 	http.HandleFunc("/misc", handlerMisc)
+	http.HandleFunc("/search", handlerSearch)
 
 	fmt.Println("Server listening on port 8080")
 	err := http.ListenAndServe(":8080", nil)
@@ -205,6 +210,39 @@ func handlerMisc(w http.ResponseWriter, r *http.Request) {
 	idx := rand.IntN(len(none))
 	resp := none[idx]
 
+	fmt.Fprintf(w, "%s", resp)
+}
+
+func handlerSearch(w http.ResponseWriter, r *http.Request) {
+	resp := ""
+	// Parse the URL query string
+	query := r.URL.Query()
+
+	// Extract the "pattern" parameter. Returns a []string (every parameter can have several comma-separated values)
+	pattern, ok := query["pattern"]
+	if !ok {
+		fmt.Fprintf(w, "Missing 'pattern' parameter in query string")
+		return
+	}
+	fmt.Println(pattern)
+
+	// Revisit dites.txt line by line. If found the pattern, append to the response
+	file, err := os.Open("dites.txt")
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		lineLower := strings.ToLower(line)
+
+		if strings.Contains(lineLower, pattern[0]) {
+			resp += line + "<br>"
+		}
+	}
 	fmt.Fprintf(w, "%s", resp)
 }
 
