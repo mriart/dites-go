@@ -216,10 +216,10 @@ func handlerMisc(w http.ResponseWriter, r *http.Request) {
 func handlerSearch(w http.ResponseWriter, r *http.Request) {
 	resp := ""
 	// Parse the URL query string
-	query := r.URL.Query()
+	params := r.URL.Query()
 
 	// Extract the "pattern" parameter. Returns a []string (every parameter can have several comma-separated values)
-	pattern, ok := query["pattern"]
+	pattern, ok := params["pattern"]
 	if !ok {
 		fmt.Fprintf(w, "Missing 'pattern' parameter in query string")
 		return
