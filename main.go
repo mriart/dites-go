@@ -47,7 +47,7 @@ const (
 					width: 250px;
 				}
 				</style>
-				<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+				<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 				<script>
 				$(document).ready(function(){
 					$("#btn1").click(function(){
@@ -57,7 +57,6 @@ const (
 					$("#p1").load("misc");       
 					});
 					$("#btn3").click(function(){
-					//pattern_value = $("input:text").val();
 					pattern_value = $("#in1").val();
 					url = "search?pattern=" + escape(pattern_value);
 					$("#p1").load(url);
