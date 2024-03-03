@@ -57,7 +57,7 @@ const (
 					<button hx-get="/misc" hx-target="#content">Altres dites</button><br>
 					<input type="text" name="pattern"
 						hx-get="/search"
-						hx-trigger="click from:#btn-search"
+						hx-trigger="click from:#btn-search, keyup[keyCode==13]"
 						hx-target="#content"><br>
 					<button id="btn-search">Cerca</button>
 				</div>
@@ -223,8 +223,9 @@ func handlerSearch(w http.ResponseWriter, r *http.Request) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		lineLower := strings.ToLower(line)
+		patternLower := strings.ToLower(pattern[0])
 
-		if strings.Contains(lineLower, pattern[0]) {
+		if strings.Contains(lineLower, patternLower) {
 			resp += line + "<br>"
 		}
 	}
