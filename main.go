@@ -21,10 +21,8 @@ const (
 				<html>
 				<head>
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<link rel="icon" type="image/png" href="/res/favicon.png?"/>
-				<link rel="apple-touch-icon" sizes="128x128" href="/res/and-dites.jpg">
 				<style>
-				p {
+				div {
 						font-family: sans-serif;
 						font-size: 24px;
 				}
@@ -47,33 +45,21 @@ const (
 					width: 250px;
 				}
 				</style>
-				<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-				<script>
-				$(document).ready(function(){
-					$("#btn1").click(function(){
-					$("#p1").load("today");
-					});
-					$("#btn2").click(function(){
-					$("#p1").load("misc");       
-					});
-					$("#btn3").click(function(){
-					pattern_value = $("#in1").val();
-					url = "search?pattern=" + escape(pattern_value);
-					$("#p1").load(url);
-					});
-				});
-				</script>
+				<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 				</head>
 				<body>
-				<p id="p1" align="center">
+				<div align="center" id="content">
 				`
 	postHTML = `
-				</p><br>
+				</div><br><br>				
 				<div align="center">
-					<button id="btn1">Una altra dita del dia</button><br><br>
-					<button id="btn2">Altres dites</button><br><br>
-					<input id="in1" type="text" name="pattern" onkeydown='if (event.keyCode == 13) document.getElementById("btn3").click();'/><br>
-						<button id="btn3">Cerca</button>
+					<button hx-get="/today" hx-target="#content">Una altra dita del dia</button><br>
+					<button hx-get="/misc" hx-target="#content">Altres dites</button><br>
+					<input type="text" name="pattern"
+						hx-get="/search"
+						hx-trigger="click from:#btn-search"
+						hx-target="#content"><br>
+					<button id="btn-search">Cerca</button>
 				</div>
 				</body>
 				</html>
