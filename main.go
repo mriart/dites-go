@@ -7,63 +7,13 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"html/template"
 	"math/rand/v2"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
 	"time"
-)
-
-const (
-	preHTML = `	
-				<!DOCTYPE html>
-				<html>
-				<head>
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<style>
-				div {
-						font-family: sans-serif;
-						font-size: 24px;
-				}
-				button {
-					background-color: #4CAF50; /* Green */
-					border: none;
-					color: white;
-					padding: 15px 32px;
-					text-align: center;
-					text-decoration: none;
-					display: inline-block;
-					font-size: 16px;
-					margin: 4px 2px;
-					cursor: pointer;
-					border-radius: 4px;
-					width: 250px;
-				}
-				input {
-					font-size: 16px;
-					width: 250px;
-				}
-				</style>
-				<script src="https://unpkg.com/htmx.org@1.9.10"></script>
-				</head>
-				<body>
-				<div align="center" id="content">
-				`
-	postHTML = `
-				</div><br><br>				
-				<div align="center">
-					<button hx-get="/today" hx-target="#content">Una altra dita del dia</button><br>
-					<button hx-get="/misc" hx-target="#content">Altres dites</button><br>
-					<input type="text" name="pattern"
-						hx-get="/search"
-						hx-trigger="click from:#btn-search, keyup[keyCode==13]"
-						hx-target="#content"><br>
-					<button id="btn-search">Cerca</button>
-				</div>
-				</body>
-				</html>
-				`
 )
 
 var (
@@ -169,6 +119,7 @@ func init() {
 }
 
 func main() {
+
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/today", handlerToday)
 	http.HandleFunc("/misc", handlerMisc)
@@ -183,7 +134,16 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	resp := ditaOfToday()
-	fmt.Fprintf(w, "%s", preHTML+resp+postHTML)
+
+	// Define data to pass to the template
+	data := map[string]string{"Dita": resp}
+
+	// Parse the template file and execute it
+	tmpl, _ := template.ParseFiles("index.html")
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		fmt.Fprintf(w, "%s", err)
+	}
 }
 
 func handlerToday(w http.ResponseWriter, r *http.Request) {
