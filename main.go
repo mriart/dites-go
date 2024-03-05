@@ -119,7 +119,6 @@ func init() {
 }
 
 func main() {
-
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/today", handlerToday)
 	http.HandleFunc("/misc", handlerMisc)
