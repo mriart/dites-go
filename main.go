@@ -123,6 +123,7 @@ func main() {
 	http.HandleFunc("/today", handlerToday)
 	http.HandleFunc("/misc", handlerMisc)
 	http.HandleFunc("/search", handlerSearch)
+	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("./img"))))
 
 	fmt.Println("Server listening on port 8080")
 	err := http.ListenAndServe(":8080", nil)
