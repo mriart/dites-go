@@ -42,15 +42,12 @@
 </head>
 
 <body>
-    <div align="center" id="content">
-        {{.Dita}}
-    </div><br><br>
+    <div id="content" align="center" hx-get="/today" hx-trigger="load"></div><br><br>
     <div align="center">
-        <button hx-get="/today" hx-target="#content">Una altra dita del dia</button><br>
+        <button hx-get="/month" hx-target="#content">Altres dites del mes</button><br>
         <button hx-get="/misc" hx-target="#content">Altres dites</button><br>
-        <input type="text" name="pattern" hx-get="/search" hx-trigger="click from:#btn-search, keyup[keyCode==13]"
-            hx-target="#content"><br>
-        <button id="btn-search">Cerca</button>
+        <input id="search" type="text" name="pattern" hx-get="/search" hx-trigger="keyup delay:400ms" hx-target="#content"><br>
+        <button hx-include="#search" hx-get="/searchall" hx-target="#content">Cerca tot</button>
     </div>
 </body>
 

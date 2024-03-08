@@ -7,7 +7,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"html/template"
 	"math/rand/v2"
 	"net/http"
 	"os"
@@ -119,11 +118,13 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+	http.Handle("/", http.FileServer(http.Dir(".")))
+	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("./img"))))
 	http.HandleFunc("/today", handlerToday)
+	http.HandleFunc("/month", handlerMonth)
 	http.HandleFunc("/misc", handlerMisc)
 	http.HandleFunc("/search", handlerSearch)
-	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("./img"))))
+	http.HandleFunc("/searchall", handlerSearchAll)
 
 	fmt.Println("Server listening on port 8080")
 	err := http.ListenAndServe(":8080", nil)
@@ -132,33 +133,63 @@ func main() {
 	}
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	resp := ditaOfToday()
-
-	// Define data to pass to the template
-	data := map[string]string{"Dita": resp}
-
-	// Parse the template file and execute it
-	tmpl, _ := template.ParseFiles("index.html")
-	err := tmpl.Execute(w, data)
-	if err != nil {
-		fmt.Fprintf(w, "%s", err)
-	}
+func handlerToday(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, ditaOfToday())
 }
 
-func handlerToday(w http.ResponseWriter, r *http.Request) {
-	resp := randomDitaMonth()
-	fmt.Fprintf(w, "%s", resp)
+func handlerMonth(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, randomDitaMonth())
 }
 
 func handlerMisc(w http.ResponseWriter, r *http.Request) {
 	idx := rand.IntN(len(none))
 	resp := none[idx]
 
-	fmt.Fprintf(w, "%s", resp)
+	fmt.Fprint(w, resp)
 }
 
 func handlerSearch(w http.ResponseWriter, r *http.Request) {
+	resp := ""
+	// Parse the URL query string
+	params := r.URL.Query()
+
+	// Extract the "pattern" parameter. Returns a []string (every parameter can have several comma-separated values)
+	pattern, ok := params["pattern"]
+	if !ok {
+		fmt.Fprintf(w, "Missing 'pattern' parameter in query string")
+		return
+	}
+	fmt.Println(pattern)
+
+	// Revisit dites.txt line by line. If found the pattern, append to the response
+	file, err := os.Open("dites.txt")
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	count := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		lineLower := strings.ToLower(line)
+		patternLower := strings.ToLower(pattern[0])
+
+		if strings.Contains(lineLower, patternLower) && count < 3 {
+			resp += line + "<br>"
+			count++
+		}
+	}
+
+	if count == 3 {
+		resp += "...<br>"
+	}
+
+	fmt.Fprint(w, resp)
+}
+
+func handlerSearchAll(w http.ResponseWriter, r *http.Request) {
 	resp := ""
 	// Parse the URL query string
 	params := r.URL.Query()
