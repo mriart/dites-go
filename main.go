@@ -30,6 +30,7 @@ var (
 	dec    = []string{}
 	none   = []string{}
 	todays = []string{}
+	all    = []string{}
 
 	noMonth  bool
 	noSeason bool
@@ -114,12 +115,14 @@ func init() {
 		if re.MatchString(lineLower) {
 			todays = append(todays, line)
 		}
+
+		all = append(all, line)
 	}
 }
 
 func main() {
 	http.Handle("/", http.FileServer(http.Dir(".")))
-	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("./img"))))
+	http.Handle("/res/", http.StripPrefix("/res/", http.FileServer(http.Dir("./res"))))
 	http.HandleFunc("/today", handlerToday)
 	http.HandleFunc("/month", handlerMonth)
 	http.HandleFunc("/misc", handlerMisc)
@@ -149,7 +152,6 @@ func handlerMisc(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerSearch(w http.ResponseWriter, r *http.Request) {
-	resp := ""
 	// Parse the URL query string
 	params := r.URL.Query()
 
@@ -159,26 +161,26 @@ func handlerSearch(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Missing 'pattern' parameter in query string")
 		return
 	}
-	fmt.Println(pattern)
+	fmt.Println(pattern[0])
 
-	// Revisit dites.txt line by line. If found the pattern, append to the response
-	file, err := os.Open("dites.txt")
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-	defer file.Close()
+	// Breaks pattern[0] into all words, and place in a slice
+	words := strings.Fields(pattern[0])
 
-	scanner := bufio.NewScanner(file)
+	// Loops over slice all to find the words. To randomize the results, start from a random position snd loop circularly
+	// Pay attention to the circular looping with mod (opartion %)
+	resp := ""
+	length := len(all)
 	count := 0
-	for scanner.Scan() {
-		line := scanner.Text()
-		lineLower := strings.ToLower(line)
-		patternLower := strings.ToLower(pattern[0])
+	startIndex := rand.IntN(length)
+	endIndex := (startIndex - 1) % length
 
-		if strings.Contains(lineLower, patternLower) && count < 3 {
-			resp += line + "<br>"
+	for i := startIndex; ; i = (i + 1) % length {
+		if containsAllSubstrs(all[i], words) {
+			resp += all[i] + "<br>"
 			count++
+		}
+		if count == 3 || i == endIndex {
+			break
 		}
 	}
 
@@ -191,6 +193,7 @@ func handlerSearch(w http.ResponseWriter, r *http.Request) {
 
 func handlerSearchAll(w http.ResponseWriter, r *http.Request) {
 	resp := ""
+
 	// Parse the URL query string
 	params := r.URL.Query()
 
@@ -200,27 +203,19 @@ func handlerSearchAll(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Missing 'pattern' parameter in query string")
 		return
 	}
-	fmt.Println(pattern)
+	fmt.Println(pattern[0])
 
-	// Revisit dites.txt line by line. If found the pattern, append to the response
-	file, err := os.Open("dites.txt")
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-	defer file.Close()
+	// Breaks pattern[0] into all words, and place in a slice
+	words := strings.Fields(pattern[0])
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		lineLower := strings.ToLower(line)
-		patternLower := strings.ToLower(pattern[0])
-
-		if strings.Contains(lineLower, patternLower) {
+	// Looks in slice of strings all for all words
+	for _, line := range all {
+		if containsAllSubstrs(line, words) {
 			resp += line + "<br>"
 		}
 	}
-	fmt.Fprintf(w, "%s", resp)
+
+	fmt.Fprint(w, resp)
 }
 
 // Return dita of today
@@ -339,4 +334,18 @@ func monthCat(month int) string {
 	default:
 		return "not a month"
 	}
+}
+
+// Analyzes if a string contains (case-insensitive) all substrings. Returns a boolean
+func containsAllSubstrs(str string, substrings []string) bool {
+	strLower := strings.ToLower(str)
+	allPresent := true
+
+	for _, substring := range substrings {
+		if !strings.Contains(strLower, strings.ToLower(substring)) {
+			allPresent = false
+			break
+		}
+	}
+	return allPresent
 }
