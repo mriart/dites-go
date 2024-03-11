@@ -1,6 +1,6 @@
 // Dites
 // Starts a web server that returns catalan dites
-// Marc Riart Solans, 202402
+// Marc Riart Solans, 202403
 
 package main
 
@@ -36,6 +36,13 @@ var (
 	noSeason bool
 )
 
+// Init initializes all variables, previosly defined as global.
+// The function reads line by line the file dites.txt and fills the following slices:
+//
+//	gen - dec, contains sentences of the month
+//	none, the rest, no month associated
+//	todays, contains those that are of a particular day (Sant Jordi, Nadal...)
+//	all, contains all, for quick searches
 func init() {
 	// Open the file
 	file, err := os.Open("dites.txt")

@@ -13,24 +13,18 @@ button {
     display: inline-block;
     font-size: 16px;
     margin: 4px 2px;
-    cursor: pointer;
     border-radius: 4px;
     width: 280px;
+    cursor: pointer;
 }
 
-input {
+input[type="text"] {
     font-size: 16px;
     border: solid;
     border-color: #4CAF50;
     border-radius: 4px;
-    background-image: url("/res/loupe.svg");
-    background-size: 20px;
-    background-repeat: no-repeat;
-    background-position: 95%;
-}
-
-input[type="text"] {
-    width: 234px;
+    border-width: 1px;
+    width: 236px;
     height: 40px;
     margin: 4px 2px;
 }
