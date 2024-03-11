@@ -30,7 +30,7 @@ input {
 }
 
 input[type="text"] {
-    width: 240px; /* Sets a fixed width of pixels */
+    width: 234px;
     height: 40px;
     margin: 4px 2px;
-  }
+}
