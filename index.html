@@ -3,7 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Input Fields</title>
+    <title>Dites Catalanes</title>
     <link rel="stylesheet" href="/res/style.css">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
@@ -13,7 +13,8 @@
     <div align="center">
         <button hx-get="/month" hx-target="#content">Altres dites del mes</button><br>
         <button hx-get="/misc" hx-target="#content">Altres dites</button><br>
-        <input id="search" type="text" name="pattern" hx-get="/search"  hx-trigger="keyup[keyCode==13]" hx-target="#content"><br>
+        <input id="search" type="text" name="pattern" hx-get="/search" hx-target="#content"> 
+        <img src="/res/arrow.svg" width="30px" height="40px" style="vertical-align: middle;" hx-get="/search" hx-include="#search" hx-trigger="click" hx-target="#content"><br>
         <button hx-include="#search" hx-get="/searchall" hx-target="#content">Cerca tot</button>
     </div>
 </body>

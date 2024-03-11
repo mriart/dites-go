@@ -4,8 +4,7 @@ div {
 }
 
 button {
-    background-color: #4CAF50;
-    /* Green */
+    background-color: #4CAF50; /* Green */
     border: none;
     color: white;
     padding: 15px 32px;
@@ -16,13 +15,11 @@ button {
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 4px;
-    width: 250px;
+    width: 280px;
 }
 
 input {
     font-size: 16px;
-    width: 242px;
-    height: 32px;
     border: solid;
     border-color: #4CAF50;
     border-radius: 4px;
@@ -31,3 +28,9 @@ input {
     background-repeat: no-repeat;
     background-position: 95%;
 }
+
+input[type="text"] {
+    width: 240px; /* Sets a fixed width of pixels */
+    height: 40px;
+    margin: 4px 2px;
+  }

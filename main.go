@@ -166,26 +166,19 @@ func handlerSearch(w http.ResponseWriter, r *http.Request) {
 	// Breaks pattern[0] into all words, and place in a slice
 	words := strings.Fields(pattern[0])
 
-	// Loops over slice all to find the words. To randomize the results, start from a random position snd loop circularly
-	// Pay attention to the circular looping with mod (opartion %)
-	resp := ""
-	length := len(all)
-	count := 0
-	startIndex := rand.IntN(length)
-	endIndex := (startIndex - 1) % length
-
-	for i := startIndex; ; i = (i + 1) % length {
-		if containsAllSubstrs(all[i], words) {
-			resp += all[i] + "<br>"
-			count++
-		}
-		if count == 3 || i == endIndex {
-			break
+	// Loops over slice all to find the words. Fills a that contains the indices of the hits (hitIndices)
+	hitIndices := []int{}
+	for i, line := range all {
+		if containsAllSubstrs(line, words) {
+			hitIndices = append(hitIndices, i)
 		}
 	}
 
-	if count == 3 {
-		resp += "...<br>"
+	// Search for a random index, return the line value of []all of that index
+	resp := ""
+	if len(hitIndices) > 0 {
+		idx := rand.IntN(len(hitIndices))
+		resp += all[hitIndices[idx]] + "<br>" + "..." + "<br>"
 	}
 
 	fmt.Fprint(w, resp)
