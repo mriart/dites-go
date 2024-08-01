@@ -1,11 +1,13 @@
 // Dites
 // Starts a web server that returns catalan dites
-// Marc Riart Solans, 202403
+// Marc Riart Solans, V1 202403
+// V2, added "Invent" dita with AI, 202408
 
 package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"math/rand/v2"
 	"net/http"
@@ -13,6 +15,9 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/google/generative-ai-go/genai"
+	"google.golang.org/api/option"
 )
 
 var (
@@ -135,6 +140,7 @@ func main() {
 	http.HandleFunc("/misc", handlerMisc)
 	http.HandleFunc("/search", handlerSearch)
 	http.HandleFunc("/searchall", handlerSearchAll)
+	http.HandleFunc("/invent", handlerInvent)
 
 	fmt.Println("Server listening on port 8080")
 	err := http.ListenAndServe(":8080", nil)
@@ -214,6 +220,27 @@ func handlerSearchAll(w http.ResponseWriter, r *http.Request) {
 			resp += line + "<br>"
 		}
 	}
+
+	fmt.Fprint(w, resp)
+}
+
+func handlerInvent(w http.ResponseWriter, r *http.Request) {
+	resp := ""
+
+	// Parse the URL query string
+	params := r.URL.Query()
+
+	// Extract the "pattern" parameter. Returns a []string (every parameter can have several comma-separated values)
+	pattern, ok := params["pattern"]
+	if !ok {
+		fmt.Fprintf(w, "Missing 'pattern' parameter in query string")
+		return
+	}
+	fmt.Println(pattern[0])
+
+	// Invent with LLM a new sentence "dita"
+	resp = inventDita(pattern[0])
+	resp += "<br>"
 
 	fmt.Fprint(w, resp)
 }
@@ -302,6 +329,30 @@ func randomDitaMonth() string {
 		resp = ""
 	}
 	return resp
+}
+
+// Invent a dita with the provided words in a slice
+func inventDita(words string) string {
+	fmt.Println("Inventa un i sols un refrayn en català que contingui les paraules " + words)
+
+	ctx := context.Background()
+	//client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
+	client, err := genai.NewClient(ctx, option.WithAPIKey("AIzaSyBqrysOed1bi0Conv1stRzN5soRb2S0lcQ"))
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer client.Close()
+
+	model := client.GenerativeModel("gemini-1.5-flash")
+	resp, err := model.GenerateContent(ctx, genai.Text("Inventa un i sols un refrayn en català que contingui les paraules "+words))
+	if err != nil {
+		fmt.Println(err)
+		return "Error when generating..."
+	}
+
+	r := fmt.Sprint(resp.Candidates[0].Content.Parts[0])
+	fmt.Println(r)
+	return r
 }
 
 // Translates months (1, 2...) into catalan (gener, febrer...)
