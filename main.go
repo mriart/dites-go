@@ -336,8 +336,8 @@ func inventDita(words string) string {
 	fmt.Println("Inventa un i sols un refrayn en català que contingui les paraules " + words)
 
 	ctx := context.Background()
-	//client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
-	client, err := genai.NewClient(ctx, option.WithAPIKey("AIzaSyBqrysOed1bi0Conv1stRzN5soRb2S0lcQ"))
+	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
+	//client, err := genai.NewClient(ctx, option.WithAPIKey("AIzaSyBqrysOed1bi0Conv1stRzN5soRb2S0lcQ"))
 	if err != nil {
 		fmt.Println(err)
 	}
